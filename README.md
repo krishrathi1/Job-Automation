@@ -1,4 +1,4 @@
-# O-Clario: Autonomous AI-Powered Job Hunter (100% Free n8n Agent)
+# JobX: Autonomous AI-Powered Job Hunter (100% Free n8n Agent)
 
 <div align="center">
   <img src="https://img.shields.io/badge/n8n-Compatible-FF6C37?style=for-the-badge&logo=n8n&logoColor=white" alt="n8n Compatible">
