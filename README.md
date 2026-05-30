@@ -9,9 +9,9 @@
 
 ---
 
-**O-Clario** is a production-grade, autonomous, AI-driven job hunt agent built entirely on **n8n**. It runs **100% free of charge** by combining free public job board endpoints with the generous free tier of **Google Gemini 2.0 Flash**. 
+**JobX** is a production-grade, autonomous, AI-driven job hunt agent built entirely on **n8n**. It runs **100% free of charge** by combining free public job board endpoints with the generous free tier of **Google Gemini 2.0 Flash**. 
 
-O-Clario concurrently scrapes multiple major remote job boards, uses Gemini AI to parse your resume, matches and scores opportunities from 0-100 against your profile, drafts personalized cover letter pitch angles, highlights missing skills, and delivers a highly polished daily strategy card straight to your Telegram chat.
+JobX concurrently scrapes multiple major remote job boards, uses Gemini AI to parse your resume, matches and scores opportunities from 0-100 against your profile, drafts personalized cover letter pitch angles, highlights missing skills, and delivers a highly polished daily strategy card straight to your Telegram chat.
 
 ---
 
@@ -128,7 +128,7 @@ graph TD
 
 ## 📈 Supported Job Boards (100% Free & Keyless APIs)
 
-O-Clario leverages the following keyless JSON feeds, completely bypassing rate-limited scrapers or paid key services:
+JobX leverages the following keyless JSON feeds, completely bypassing rate-limited scrapers or paid key services:
 
 | Platform | Job Exporter API Endpoint | Category / Focus | Key Required? |
 | :--- | :--- | :--- | :--- |
@@ -143,7 +143,7 @@ O-Clario leverages the following keyless JSON feeds, completely bypassing rate-l
 
 ## ⚙️ Production Guidelines & Optimizations
 
-*   **API Rate Limits**: Google Gemini's free tier has a limit of 15 Requests Per Minute (RPM). To safeguard against rate-limiting on high-yield scraping runs, O-Clario features a built-in pre-scoring filter that ranks scraped jobs using keywords and only passes the top `maxJobsForGemini` matches (default: `30`) to the LLM for deep matching.
+*   **API Rate Limits**: Google Gemini's free tier has a limit of 15 Requests Per Minute (RPM). To safeguard against rate-limiting on high-yield scraping runs, JobX features a built-in pre-scoring filter that ranks scraped jobs using keywords and only passes the top `maxJobsForGemini` matches (default: `30`) to the LLM for deep matching.
 *   **Dynamic Scraping**: If you want to search only a subset of job boards, simply modify the `platforms` list inside the **Load Resume & Preferences** node. The dynamic switch router will automatically bypass deactivated platforms without blocking the rest of the workflow.
 *   **Hosting cost**: You can host this n8n instance on free application hosting tiers (like Render, Koyeb, or Hugging Face Spaces) or run it locally on your PC.
 
