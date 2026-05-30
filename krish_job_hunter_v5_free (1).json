@@ -1,0 +1,1157 @@
+{
+  "name": "Krish Rathi — Job Hunter (100% Free)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "be19bb9f-579c-4ee2-8eaa-60e59c2c2e44",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        144,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ══════════════════════════════════════════\n// Krish Rathi's resume is baked in — just click Execute!\n// Modify userPreferences below to customise job search.\n// ══════════════════════════════════════════\n\nconst resumeText = \"9352339808 | krishrathi877@gmail.com | linkedin.com/in/krish-rathi | github.com/krish\\n\\nKrish Rathi\\n\\nEducation\\n\\nBML Munjal University\\nB.Tech in Computer Science | Coursework: DSA, OS, DBMS, Machine Learning, Computer Networks\\n\\nGurgaon, Haryana\\n2023 \\u2013 2027\\n\\nExperience\\n\\nChatbot Developer Intern\\nRANNLAB Technologies\\n\\nJun 2025 \\u2013 Nov 2025\\nOn-site\\n\\u2013 Designed a scalable AI-driven educational chatbot using LLM fine-tuning and RAG pipelines, reducing\\n\\nmanual support load by 70% via automated intent classification and response orchestration.\\n\\n\\u2013 Built a facial recognition identity verification pipeline with AWS Rekognition, achieving 98.87%\\n\\naccuracy and securing access for 1,000+ daily users via real-time session management.\\n\\n\\u2013 Developed a serverless AWS Lambda media preprocessing pipeline with event-driven triggers, improving\\n\\nthroughput by 30%; created WCAG-compliant modular React UI components for cross-platform consistency.\\n\\nProjects\\n\\nStockVision \\u2013 AI Stock Intelligence Platform | Next.js, Gemini AI, TypeScript, REST APIs | Live\\n\\n\\u2013 Built a production-grade stock analytics platform with Gemini AI for natural language insights, real-time\\n\\nprice feeds, and financial news aggregation; implemented semantic search enabling conversational market queries\\nwith contextually ranked results.\\n\\n\\u2013 Engineered an SSR-optimized frontend with Next.js App Router, code splitting, lazy loading, and edge\\n\\ncaching for high Lighthouse scores; designed RESTful API integrations across multiple financial data providers.\\n\\u2013 Implemented user portfolio tracking with watchlist management, personalized alerts, and historical performance\\nvisualization using interactive charts; optimized API call efficiency with request batching and debouncing to\\nstay within rate limits.\\n\\nKishanBhai \\u2013 Agricultural Intelligence Platform | Next.js, Genkit, Firebase, Gemini AI | Live\\n\\n\\u2013 Architected a multilingual (5+ languages) offline-first PWA with 10+ AI features \\u2013 crop disease detection\\n\\nvia Gemini multimodal vision, conversational assistance, and market analytics across 100+ commodities.\\n\\u2013 Built a serverless backend on Firebase + Genkit AI with autoscaling, low-latency inference, and Firestore\\n\\nsync for live market pricing.\\n\\n\\u2013 Integrated government agricultural APIs (mandi prices, weather forecasts, soil health data) with intelligent\\n\\ncaching, enabling farmers to make data-driven decisions without reliable internet connectivity via PWA offline\\nstorage.\\n\\nAgentic AI Browser \\u2013 Intelligent Search & Automation | Next.js, TypeScript, LLMs, Agentic AI\\n\\n\\u2013 Engineered an LLM-powered agentic browser with autonomous multi-step task execution, semantic web search,\\nsummarization, and workflow automation via tool-use and chain-of-thought prompting; achieved zero-GPU\\nexecution through browser-side orchestration.\\n\\nTechnical Skills\\n\\nLanguages: Python, Java, C, C++, SQL, JavaScript, TypeScript, HTML, CSS\\nFrameworks & Web: React, Next.js, Node.js, REST APIs, GraphQL, PWA, SSR/SSG\\nAI/ML: LLM Fine-tuning, RAG, Prompt Engineering, Gemini API, Vertex AI, Genkit, TensorFlow, OpenCV, n8n\\nCloud & DevOps: AWS (Lambda, Rekognition, S3), Firebase (Firestore, Auth, Hosting), Docker, Linux, Nginx, Git\\n\\nCertifications & Achievements\\n\\nGoogle Cloud: Generative AI Fundamentals | Introduction to Large Language Models | Responsible AI \\u2013 Google Cloud\\nSkills Boost\\nHackathons: IIT Ropar Winner (2025) \\u2013 3\\u00d7 wins and 6\\u00d7 national-level finalist in AI/ML & Full Stack tracks\\nDSA: 280+ problems solved on LeetCode & Codeforces \\u2013 dynamic programming, graphs, trees, system design\";\n\nconst userPreferences = {\n  locations:       ['Remote', 'Gurgaon', 'Bengaluru', 'Hyderabad', 'Delhi'],\n  jobType:         ['Full-time', 'Internship'],\n  // Platforms used: jsearch(LinkedIn/Indeed/Glassdoor), naukri_rapidapi,\n  // unstop, arbeitnow, remoteok, adzuna, themuse\n  platforms: ['remotive', 'jobicy', 'unstop', 'arbeitnow', 'remoteok', 'himalayas', 'themuse']\n};\n\nreturn [{\n  json: {\n    resumeText,\n    userPreferences,\n    requestId: 'job-hunt-' + Date.now(),\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "8d34bea1-00ed-49b9-96a7-ac8c91f830a3",
+      "name": "Load Resume & Preferences",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are an expert ATS and career consultant AI. Analyze the resume text below and extract all key information. Return ONLY valid JSON, no markdown fences, no explanation.\n\nResume Text:\n{{ $json.resumeText }}\n\nReturn this exact JSON structure:\n{\n  \"candidate\": { \"name\": \"\", \"email\": \"\", \"phone\": \"\", \"location\": \"\", \"linkedin_url\": \"\", \"github_url\": \"\" },\n  \"professional\": { \"current_title\": \"\", \"seniority\": \"\", \"years_experience\": 0, \"industry\": \"\", \"domain\": \"\" },\n  \"skills\": { \"technical\": [], \"soft\": [], \"tools\": [], \"certifications\": [], \"languages_spoken\": [] },\n  \"education\": { \"degree\": \"\", \"field\": \"\", \"university\": \"\", \"graduation_year\": null },\n  \"work_history\": [{ \"company\": \"\", \"role\": \"\", \"duration\": \"\", \"highlights\": [] }],\n  \"search\": {\n    \"suggested_titles\": [],\n    \"keywords\": [],\n    \"salary_range\": { \"min\": null, \"max\": null, \"currency\": \"INR\" },\n    \"remote_score\": 0\n  },\n  \"projects\": [{ \"name\": \"\", \"description\": \"\", \"tech_stack\": [], \"impact\": \"\" }]\n}"
+      },
+      "id": "a02b127f-e738-4bbe-ba0a-a2da12be326d",
+      "name": "Parse Resume Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        640,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "id": "fd42182b-5f15-48f5-b522-9e48a9d538e4",
+      "name": "Gemini — Parse Resume",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        688,
+        1504
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GEMINI_CRED_ID",
+          "name": "Google Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawResponse = $json.text || '';\n\nlet resumeData;\n\ntry {\n  let cleaned = rawResponse.trim();\n\n  const s = cleaned.indexOf('{');\n  const e = cleaned.lastIndexOf('}');\n\n  if (s !== -1 && e !== -1) {\n    cleaned = cleaned.substring(s, e + 1);\n  }\n\n  resumeData = JSON.parse(cleaned);\n\n} catch (err) {\n\n  throw new Error(\n    'Failed to parse resume AI JSON: ' +\n    err.message\n  );\n}\n\n// Retrieve preferences dynamically from Load Resume & Preferences node\nlet resumePrefs = {};\ntry {\n  resumePrefs = $(\"Load Resume & Preferences\").first().json.userPreferences || {};\n} catch (e) {\n  console.log(\"Failed to retrieve preferences from prior node, using defaults\", e.message);\n}\n\nconst prefs = {\n  locations: resumePrefs.locations || ['Remote', 'Gurgaon', 'Bengaluru', 'Hyderabad'],\n  jobType: resumePrefs.jobType || ['Full-time', 'Internship'],\n  platforms: resumePrefs.platforms || ['remotive', 'internshala', 'unstop', 'arbeitnow', 'remoteok', 'himalayas', 'themuse']\n};\n\nconst search = resumeData.search || {};\n\nconst suggestedTitles =\nsearch.suggested_titles || [];\n\nconst finalTitles =\nsuggestedTitles.length > 0\n? suggestedTitles\n: [\n    resumeData.professional?.current_title ||\n    'Software Engineer'\n  ];\n\nconst seniority =\nresumeData.professional?.seniority ||\n'intern';\n\nconst primaryQuery =\nfinalTitles[0];\n\nconst skillQuery =\n(resumeData.skills?.technical || [])\n.slice(0,5)\n.join(' OR ');\n\nconst locationParam =\nprefs.locations[0];\n\nreturn [{\n  json: {\n    resumeData,\n    userPreferences: prefs,\n\n    searchConfig: {\n      titles: finalTitles,\n      keywords: search.keywords || [],\n      locations: prefs.locations,\n      primaryQuery,\n      skillQuery,\n      locationParam,\n      seniority,\n\n      experienceYears:\n      resumeData.professional?.years_experience || 0,\n\n      domain:\n      resumeData.professional?.domain || '',\n\n      salaryRange:\n      search.salary_range || {},\n\n      jobType:\n      prefs.jobType,\n\n      platforms:\n      prefs.platforms\n    },\n\n    requestId:\n    'job-' + Date.now()\n  }\n}];"
+      },
+      "id": "046bdd45-20b6-4508-9711-9eb533169f22",
+      "name": "Build Search Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Output one item per platform so each scraper runs independently\nconst config = $input.first().json;\nconst platforms = config.searchConfig.platforms;\n\nreturn platforms.map(platform => ({\n  json: { ...config, currentPlatform: platform }\n}));"
+      },
+      "id": "83f3dcb1-3237-40d1-95a8-b4c03b80def2",
+      "name": "Prepare Platform Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": 0,
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.currentPlatform }}",
+                    "rightValue": "remotive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": 1,
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.currentPlatform }}",
+                    "rightValue": "jobicy",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": 2,
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.currentPlatform }}",
+                    "rightValue": "unstop",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": 3,
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.currentPlatform }}",
+                    "rightValue": "arbeitnow",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": 4,
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.currentPlatform }}",
+                    "rightValue": "remoteok",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": 5,
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.currentPlatform }}",
+                    "rightValue": "himalayas",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": 6,
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.currentPlatform }}",
+                    "rightValue": "themuse",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "id": "1381c0ae-fa2a-470b-b759-29e8ea952010",
+      "name": "Platform Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1424,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://remotive.com/api/remote-jobs",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "search",
+              "value": "={{ $json.searchConfig.primaryQuery }}"
+            },
+            {
+              "name": "limit",
+              "value": "20"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "de710a60-eb11-4426-a3f2-ad439ad35b3b",
+      "name": "Remotive Jobs (Free)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        832
+      ],
+      "settings": {
+        "continueOnFail": true
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://jobicy.com/api/v2/remote-jobs",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "count",
+              "value": "20"
+            },
+            {
+              "name": "tag",
+              "value": "={{ $json.searchConfig.primaryQuery }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (compatible; JobHunterBot/1.0)"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "id": "b4df6734-b577-4d86-8080-fdad847d8196",
+      "name": "Jobicy Jobs (Free)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        1024
+      ],
+      "settings": {
+        "continueOnFail": true
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://unstop.com/api/public/opportunity/search-result",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "per_page",
+              "value": "20"
+            },
+            {
+              "name": "page",
+              "value": "1"
+            },
+            {
+              "name": "opportunity",
+              "value": "jobs"
+            },
+            {
+              "name": "searchTerm",
+              "value": "={{ $json.searchConfig.primaryQuery }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "8362a3e1-3f18-4c77-96ed-82ea7cf75b74",
+      "name": "Unstop Jobs (Public)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        1200
+      ],
+      "settings": {
+        "continueOnFail": true
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.arbeitnow.com/api/job-board-api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "search",
+              "value": "={{ $json.searchConfig.primaryQuery }}"
+            },
+            {
+              "name": "page",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "ed09d2ed-34fd-46cf-931c-0fe85a76062b",
+      "name": "Arbeitnow Jobs (Free)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        1360
+      ],
+      "settings": {
+        "continueOnFail": true
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://remoteok.com/api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "tags",
+              "value": "={{ ($json.searchConfig.keywords || []).slice(0, 3).join(',') || 'javascript,react,python' }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (compatible; JobHunterBot/1.0)"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "39e0cd67-1669-4ff2-b617-2966d57dcabe",
+      "name": "RemoteOK Jobs (Free)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        1520
+      ],
+      "settings": {
+        "continueOnFail": true
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://himalayas.app/jobs/api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.searchConfig.primaryQuery }}"
+            },
+            {
+              "name": "limit",
+              "value": "20"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "4747574e-7396-4bf9-9684-18318333198a",
+      "name": "Himalayas Jobs (Free)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        1680
+      ],
+      "settings": {
+        "continueOnFail": true
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.themuse.com/api/public/jobs",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "category",
+              "value": "Computer and IT"
+            },
+            {
+              "name": "level",
+              "value": "Entry Level"
+            },
+            {
+              "name": "page",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "ab0faf10-d857-40a6-ae10-eec22be3d9de",
+      "name": "The Muse Jobs (Free)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        1840
+      ],
+      "settings": {
+        "continueOnFail": true
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalize raw API response into unified job schema\n// $json is the raw API response. $json.currentPlatform tells us which platform.\nconst platform = $json.currentPlatform || 'unknown';\nconst searchConfig = $json.searchConfig || {};\nconst raw = $json; // full input item including API response fields\n\nconst allJobs = [];\n\ntry {\n  if (platform === 'remotive') {\n    // Remotive free API — returns jobs[]\n    const jobs = raw.jobs || [];\n    jobs.forEach(j => allJobs.push({\n      platform: 'Remotive',\n      id: String(j.id) || ('rm-' + Math.random()),\n      title: j.title || '',\n      company: j.company_name || '',\n      location: j.candidate_required_location || 'Remote',\n      description: (j.description || '').replace(/<[^>]+>/g, '').substring(0, 800),\n      url: j.url || '',\n      salary: j.salary || '',\n      posted_date: j.publication_date || '',\n      job_type: j.job_type || 'Full-time',\n      remote: true,\n      company_logo: j.company_logo_url || '',\n      applicants: null,\n      seniority: '',\n      required_skills: j.tags || [],\n      highlights: {}\n    }));\n  }\n\n  else if (platform === 'jobicy') {\n    const jobs = raw.jobs || [];\n    jobs.forEach(j => allJobs.push({\n      platform: 'Jobicy',\n      id: String(j.id) || ('jb-' + Math.random()),\n      title: j.jobTitle || '',\n      company: j.companyName || '',\n      location: j.jobGeo || 'Remote',\n      description: (j.jobExcerpt || j.jobDescription || '').replace(/<[^>]+>/g, '').substring(0, 800),\n      url: j.url || '',\n      salary: j.salaryMin ? `$${j.salaryMin}–$${j.salaryMax}` : '',\n      posted_date: j.pubDate || '',\n      job_type: j.jobType || 'Full-time',\n      remote: true,\n      company_logo: j.companyLogo || '',\n      applicants: null,\n      seniority: j.jobLevel || '',\n      required_skills: [],\n      highlights: {}\n    }));\n  }\n\n  else if (platform === 'unstop') {\n    const items = raw.data?.data || raw.data || [];\n    items.forEach(j => {\n      const opp = j.opportunity || j;\n      allJobs.push({\n        platform: 'Unstop',\n        id: opp.id || ('un-' + Math.random()),\n        title: opp.title || '',\n        company: opp.organisation?.name || opp.company_name || '',\n        location: opp.organisation?.city || opp.city || 'India',\n        description: opp.description || opp.extra_detail || '',\n        url: `https://unstop.com/jobs/${opp.id}-${opp.public_url || ''}`,\n        salary: opp.salary || opp.stipend || '',\n        posted_date: opp.start || '',\n        job_type: opp.type || 'Full-time',\n        remote: (opp.type_meta || '').toLowerCase().includes('remote'),\n        company_logo: opp.organisation?.logo_url || '',\n        applicants: opp.registered_count || null,\n        seniority: '',\n        required_skills: [],\n        highlights: {}\n      });\n    });\n  }\n\n  else if (platform === 'arbeitnow') {\n    const jobs = raw.data || [];\n    jobs.forEach(j => allJobs.push({\n      platform: 'Arbeitnow',\n      id: j.slug || ('an-' + Math.random()),\n      title: j.title || '',\n      company: j.company_name || '',\n      location: j.location || 'Europe',\n      description: (j.description || '').substring(0, 800),\n      url: j.url || '',\n      salary: '',\n      posted_date: j.created_at ? new Date(j.created_at * 1000).toISOString() : '',\n      job_type: (j.job_types || []).join(', ') || 'Full-time',\n      remote: j.remote || false,\n      company_logo: '',\n      applicants: null,\n      seniority: '',\n      required_skills: j.tags || [],\n      highlights: {}\n    }));\n  }\n\n  else if (platform === 'remoteok') {\n    // RemoteOK returns an array; first element is metadata, skip it\n    const jobs = Array.isArray(raw) ? raw.filter(j => j.id && j.position) : [];\n    jobs.forEach(j => allJobs.push({\n      platform: 'RemoteOK',\n      id: String(j.id) || ('ro-' + Math.random()),\n      title: j.position || '',\n      company: j.company || '',\n      location: 'Remote',\n      description: (j.description || '').substring(0, 800),\n      url: j.url || `https://remoteok.com/l/${j.id}`,\n      salary: j.salary_min ? `$${j.salary_min}–$${j.salary_max}` : '',\n      posted_date: j.epoch ? new Date(parseInt(j.epoch) * 1000).toISOString() : '',\n      job_type: 'Full-time',\n      remote: true,\n      company_logo: j.company_logo || '',\n      applicants: j.applications || null,\n      seniority: '',\n      required_skills: j.tags || [],\n      highlights: {}\n    }));\n  }\n\n  else if (platform === 'himalayas') {\n    // Himalayas.app free jobs API — returns jobs[]\n    const jobs = raw.jobs || [];\n    jobs.forEach(j => allJobs.push({\n      platform: 'Himalayas',\n      id: String(j.id) || ('hm-' + Math.random()),\n      title: j.title || '',\n      company: j.companyName || j.company?.name || '',\n      location: j.locationRestrictions?.join(', ') || 'Remote',\n      description: (j.description || '').replace(/<[^>]+>/g, '').substring(0, 800),\n      url: j.applyUrl || j.url || '',\n      salary: j.minSalary ? `$${Math.round(j.minSalary/1000)}K–$${Math.round(j.maxSalary/1000)}K` : '',\n      posted_date: j.publishedAt || '',\n      job_type: j.jobType || 'Full-time',\n      remote: true,\n      company_logo: j.companyLogo || '',\n      applicants: null,\n      seniority: j.seniority || '',\n      required_skills: j.skills || [],\n      highlights: {}\n    }));\n  }\n\n  else if (platform === 'themuse') {\n    const jobs = raw.results || [];\n    jobs.forEach(j => allJobs.push({\n      platform: 'The Muse',\n      id: String(j.id) || ('tm-' + Math.random()),\n      title: j.name || '',\n      company: j.company?.name || '',\n      location: (j.locations || []).map(l => l.name).join(', ') || 'Remote',\n      description: (j.contents || '').replace(/<[^>]+>/g, '').substring(0, 800),\n      url: j.refs?.landing_page || '',\n      salary: '',\n      posted_date: j.publication_date || '',\n      job_type: (j.levels || []).map(l => l.name).join(', ') || 'Full-time',\n      remote: (j.locations || []).some(l => l.name.toLowerCase().includes('remote')),\n      company_logo: j.company?.refs?.logo_image || '',\n      applicants: null,\n      seniority: (j.levels || []).map(l => l.name).join(', '),\n      required_skills: [],\n      highlights: {}\n    }));\n  }\n\n} catch(err) {\n  console.log(`[${platform}] Normalize error:`, err.message);\n}\n\n// Attach searchConfig to each job for downstream use\nreturn allJobs.map(job => ({\n  json: {\n    ...job,\n    searchConfig,\n    resumeData: $json.resumeData,\n    requestId: $json.requestId,\n    userPreferences: $json.userPreferences\n  }\n}));"
+      },
+      "id": "c88a753f-0502-4201-a03b-84e351e007d6",
+      "name": "Normalize Job Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1968,
+        1280
+      ],
+      "settings": {
+        "continueOnFail": true
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all normalized jobs from all branches\n// All items are already merged by the Merge node\nconst allItems = $input.all();\nconst allJobs = allItems.map(i => i.json).filter(j => j.title && j.company);\n\n// Grab shared context from first item\nconst resumeData = allItems[0]?.json?.resumeData || {};\nconst searchConfig = allItems[0]?.json?.searchConfig || {};\nconst userPreferences = allItems[0]?.json?.userPreferences || {};\nconst requestId = allItems[0]?.json?.requestId || ('job-' + Date.now());\n\n// Heuristic pre-scoring\nconst candidateSkills = (resumeData.skills?.technical || []).map(s => s.toLowerCase());\nconst candidateTitles = (searchConfig.titles || []).map(t => t.toLowerCase());\nconst prefersRemote = (searchConfig.locations || []).some(l => l.toLowerCase().includes('remote'));\n\nconst scoredJobs = allJobs.map(job => {\n  let score = 0;\n  const title = (job.title || '').toLowerCase();\n  const desc = (job.description || '').toLowerCase();\n  const reqSkills = (job.required_skills || []).map(s => s.toLowerCase());\n\n  candidateTitles.forEach(t => { if (title.includes(t)) score += 10; });\n  candidateSkills.forEach(s => {\n    if (desc.includes(s) || title.includes(s) || reqSkills.includes(s)) score += 3;\n  });\n  if (prefersRemote && job.remote) score += 8;\n  if (job.posted_date && new Date(job.posted_date) > new Date(Date.now() - 7 * 86400000)) score += 5;\n\n  return { ...job, heuristicScore: score };\n});\n\n// Deduplicate by title+company, sort by heuristic, take top 40\nconst seen = new Set();\nconst deduped = scoredJobs\n  .sort((a, b) => b.heuristicScore - a.heuristicScore)\n  .filter(job => {\n    const key = (job.title + '|' + job.company).toLowerCase().replace(/\\s+/g, '');\n    if (seen.has(key)) return false;\n    seen.add(key);\n    return true;\n  })\n  .slice(0, 40)\n  .map(({ heuristicScore, ...j }) => j);\n\nreturn [{\n  json: {\n    aggregatedJobs: deduped,\n    totalRaw: allJobs.length,\n    resumeData,\n    searchConfig,\n    userPreferences,\n    requestId\n  }\n}];"
+      },
+      "id": "4b05e15d-6fad-4ff4-b7cf-c49f72731cdc",
+      "name": "Aggregate & Pre-Score Jobs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2512,
+        1280
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are an expert career matching AI. Score each job against the candidate profile below.\n\nCandidate Profile:\n{{ JSON.stringify($json.resumeData, null, 2) }}\n\nJobs to Score:\n{{ JSON.stringify($json.aggregatedJobs.map(j => ({ id: j.id, title: j.title, company: j.company, platform: j.platform, location: j.location, description: j.description ? j.description.substring(0, 400) : '', required_skills: j.required_skills || [], remote: j.remote })), null, 2) }}\n\nFor EACH job return a JSON array. Return ONLY the JSON array, no markdown, no explanation:\n[\n  {\n    \"job_id\": \"exact id from input\",\n    \"match_score\": 0-100,\n    \"match_reasons\": [\"reason 1\", \"reason 2\"],\n    \"missing_skills\": [\"skill\"],\n    \"strengths\": [\"strength\"],\n    \"application_priority\": \"high|medium|low\",\n    \"cover_letter_angle\": \"one sentence unique pitch angle\",\n    \"red_flags\": []\n  }\n]"
+      },
+      "id": "c3b7942f-1367-4770-a3fb-9d6bf63e6841",
+      "name": "AI Match & Score Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        2768,
+        1280
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "id": "73549d62-48f4-4142-8281-e9b880f2c594",
+      "name": "Gemini — Match & Score",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2768,
+        1440
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GEMINI_CRED_ID",
+          "name": "Google Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// $json.text = raw AI score JSON from chainLlm\n// $json.aggregatedJobs, $json.resumeData etc. are passed through by chainLlm\nconst rawScores = $json.text || '[]';\nconst aggregatedJobs = $json.aggregatedJobs || [];\n\nlet scoreMap = {};\ntry {\n  let cleaned = rawScores.trim();\n  const s = cleaned.indexOf('[');\n  const e = cleaned.lastIndexOf(']');\n  if (s !== -1 && e !== -1) cleaned = cleaned.substring(s, e + 1);\n  const scores = JSON.parse(cleaned);\n  scores.forEach(sc => { scoreMap[sc.job_id] = sc; });\n} catch(err) {\n  console.log('Score parse error:', err.message, '| First 200 chars:', rawScores.substring(0, 200));\n}\n\n// Merge AI scores into job objects\nconst scoredJobs = aggregatedJobs.map(job => {\n  const sc = scoreMap[job.id] || {};\n  return {\n    ...job,\n    match_score: sc.match_score || 0,\n    match_reasons: sc.match_reasons || [],\n    missing_skills: sc.missing_skills || [],\n    strengths: sc.strengths || [],\n    application_priority: sc.application_priority || 'low',\n    cover_letter_angle: sc.cover_letter_angle || '',\n    red_flags: sc.red_flags || []\n  };\n});\n\nconst sorted = scoredJobs.sort((a, b) => b.match_score - a.match_score);\n\nconst highPriority   = sorted.filter(j => j.application_priority === 'high').slice(0, 10);\nconst mediumPriority = sorted.filter(j => j.application_priority === 'medium').slice(0, 15);\nconst lowPriority    = sorted.filter(j => j.application_priority === 'low').slice(0, 10);\n\nconst platforms = [...new Set(sorted.map(j => j.platform))];\nconst scores = sorted.slice(0, 20).map(j => j.match_score);\nconst avgScore = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;\n\nreturn [{\n  json: {\n    jobs: { high_priority: highPriority, medium_priority: mediumPriority, low_priority: lowPriority },\n    stats: {\n      total_found: sorted.length,\n      total_raw: $json.totalRaw || 0,\n      high_priority: highPriority.length,\n      medium_priority: mediumPriority.length,\n      low_priority: lowPriority.length,\n      avg_match_score: avgScore,\n      platforms_searched: platforms\n    },\n    resumeData: $json.resumeData,\n    searchConfig: $json.searchConfig,\n    requestId: $json.requestId\n  }\n}];"
+      },
+      "id": "88179f04-4ac3-42f9-b74d-9436bab2863c",
+      "name": "Rank & Filter Jobs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3040,
+        1280
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are a senior career strategist. Generate a comprehensive job search strategy report.\n\nCandidate: {{ $json.resumeData.candidate.name }}\nProfile: {{ JSON.stringify($json.resumeData.professional) }}\nTop Skills: {{ ($json.resumeData.skills.technical || []).join(', ') }}\nEducation: {{ JSON.stringify($json.resumeData.education) }}\nTop Matches (top 5):\n{{ JSON.stringify($json.jobs.high_priority.slice(0, 5).map(j => ({ title: j.title, company: j.company, score: j.match_score, platform: j.platform, cover_letter_angle: j.cover_letter_angle }))) }}\nSearch Stats: {{ JSON.stringify($json.stats) }}\n\nReturn ONLY a JSON object with this structure, no markdown:\n{\n  \"executive_summary\": \"2-3 sentence overall assessment\",\n  \"market_position\": \"where this candidate stands in the current market\",\n  \"top_opportunities\": \"narrative about the best 2-3 opportunities found\",\n  \"resume_improvements\": [\"improvement 1\", \"improvement 2\", \"improvement 3\"],\n  \"skill_gaps\": [{ \"skill\": \"skill name\", \"importance\": \"high|medium\", \"how_to_learn\": \"resource\" }],\n  \"application_strategy\": [\"strategy 1\", \"strategy 2\", \"strategy 3\"],\n  \"networking_advice\": \"specific advice for this candidate's domain\",\n  \"salary_insight\": \"salary negotiation advice based on Indian market + experience\",\n  \"timeline\": \"realistic job hunt timeline\",\n  \"interview_prep_topics\": [\"topic 1\", \"topic 2\", \"topic 3\", \"topic 4\"]\n}"
+      },
+      "id": "542f3bf3-e7ee-4b19-a46f-f0d4029f7ff3",
+      "name": "Generate Career Strategy Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        3312,
+        1280
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "id": "0d1c256b-4820-4f95-ab92-bd5cf64d822e",
+      "name": "Gemini — Career Strategy",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        3312,
+        1440
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GEMINI_CRED_ID",
+          "name": "Google Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// $json.text = career strategy JSON from chainLlm\n// All other fields ($json.jobs, $json.stats, etc.) passed through\nconst rawStrategy = $json.text || '{}';\n\nlet careerStrategy = {};\ntry {\n  let cleaned = rawStrategy.trim();\n  const s = cleaned.indexOf('{');\n  const e = cleaned.lastIndexOf('}');\n  if (s !== -1 && e !== -1) cleaned = cleaned.substring(s, e + 1);\n  careerStrategy = JSON.parse(cleaned);\n} catch(err) {\n  careerStrategy = { executive_summary: 'Strategy generation error: ' + err.message };\n}\n\nconst jobs = $json.jobs || {};\nconst stats = $json.stats || {};\n\nconst finalOutput = {\n  success: true,\n  request_id: $json.requestId,\n  generated_at: new Date().toISOString(),\n  candidate: $json.resumeData?.candidate || {},\n  search_stats: stats,\n  career_strategy: careerStrategy,\n  jobs: {\n    high_priority: (jobs.high_priority || []).map(j => ({\n      id: j.id, platform: j.platform, title: j.title, company: j.company,\n      location: j.location, salary: j.salary, remote: j.remote, url: j.url,\n      posted_date: j.posted_date, match_score: j.match_score,\n      match_reasons: j.match_reasons, missing_skills: j.missing_skills,\n      strengths: j.strengths, application_priority: j.application_priority,\n      cover_letter_angle: j.cover_letter_angle, red_flags: j.red_flags,\n      description_excerpt: (j.description || '').substring(0, 300)\n    })),\n    medium_priority: (jobs.medium_priority || []).map(j => ({\n      id: j.id, platform: j.platform, title: j.title, company: j.company,\n      location: j.location, url: j.url, match_score: j.match_score,\n      application_priority: j.application_priority, cover_letter_angle: j.cover_letter_angle\n    })),\n    total_found: stats.total_found || 0\n  },\n  meta: {\n    platforms_searched: stats.platforms_searched || [],\n    primary_search_query: $json.searchConfig?.primaryQuery || '',\n    note: 'Results powered by Claude AI matching'\n  }\n};\n\nreturn [{ json: finalOutput }];"
+      },
+      "id": "a767295d-5eeb-440f-9419-a2bb30460005",
+      "name": "Assemble Final Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        1280
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.jobs.high_priority.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          }
+        },
+        "options": {}
+      },
+      "id": "8f04e2c8-8b4b-4e64-b57e-57d29ca4313b",
+      "name": "Has High Priority Results?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3840,
+        1280
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "0efa6631-ef7c-42f4-9ddf-96ca230e7c38",
+      "name": "Log Results (No-op)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        4112,
+        1184
+      ],
+      "settings": {
+        "continueOnFail": true
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ✅ Job hunt complete! Results are in $json\n// Open the execution output panel to see all matched jobs and career strategy.\nconst r = $input.first().json;\n\nconsole.log('╔══════════════════════════════════════╗');\nconsole.log('║     KRISH RATHI — JOB HUNT RESULTS  ║');\nconsole.log('╚══════════════════════════════════════╝');\nconsole.log('Total jobs found   :', r.search_stats?.total_found);\nconsole.log('High priority      :', r.search_stats?.high_priority);\nconsole.log('Medium priority    :', r.search_stats?.medium_priority);\nconsole.log('Avg match score    :', r.search_stats?.avg_match_score + '%');\nconsole.log('Platforms searched :', (r.meta?.platforms_searched || []).join(', '));\nconsole.log('─────────────────────────────────────────');\n(r.jobs?.high_priority || []).forEach((j, i) => {\n  console.log(`#${i+1} [${j.match_score}%] ${j.title} @ ${j.company} (${j.platform})`);\n  console.log(`    → ${j.url}`);\n});\nconsole.log('─────────────────────────────────────────');\nconsole.log('Career Strategy:', r.career_strategy?.executive_summary);\n\nreturn [{ json: r }];"
+      },
+      "id": "daaaf63d-3ceb-408b-9a33-a4f257ad29df",
+      "name": "✅ Final Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4368,
+        1184
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const r = $input.first().json;\nconsole.log('No high-priority matches found.');\nconsole.log('Medium priority jobs available:', r.search_stats?.medium_priority);\nconsole.log('Consider broadening: add more locations, adjust job titles, or expand platforms.');\nreturn [{ json: { ...r, note: 'No high-priority matches. Medium priority jobs still available. Try broadening search.' } }];"
+      },
+      "id": "fb6f65aa-414d-4560-9703-5a4114b69568",
+      "name": "⚠️ No High Priority Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4112,
+        1392
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "fcc0bf66-4c6a-4a84-a246-fdcfd5361490",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        96,
+        1936
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const err = $input.first().json;\nconsole.error('WORKFLOW ERROR:', JSON.stringify(err, null, 2));\nreturn [{ json: {\n  error: true,\n  message: err.error?.message || 'Unknown error',\n  node: err.execution?.lastNodeExecuted || 'unknown',\n  timestamp: new Date().toISOString()\n}}];"
+      },
+      "id": "6219732f-d7de-4ac0-9951-0f9a9ca31247",
+      "name": "❌ Error Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        1936
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "5513468743",
+        "text": "=🤖 *Krish Rathi — Job Hunt Results*\n\n📊 *Summary*\n• Total jobs found: {{ $json.search_stats.total_found }}\n• 🔥 High priority: {{ $json.search_stats.high_priority }}\n• 🟡 Medium priority: {{ $json.search_stats.medium_priority }}\n• 📈 Avg match score: {{ $json.search_stats.avg_match_score }}%\n• 🌐 Platforms: {{ ($json.meta.platforms_searched || []).join(', ') }}\n\n🔥 *Top Matches*\n{{ ($json.jobs.high_priority || []).slice(0,5).map((j,i) => `#${i+1} [${j.match_score}%] *${j.title}* @ ${j.company}\\n📍 ${j.location || 'N/A'} | 🏠 ${j.remote ? 'Remote' : 'Onsite'}\\n🔗 ${j.url}`).join('\\n\\n') }}\n\n💡 *Career Strategy*\n{{ $json.career_strategy.executive_summary }}\n\n⏱ _{{ $json.generated_at }}_",
+        "additionalFields": {
+          "disable_web_page_preview": true,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "1493f577-9b4b-45b3-ac46-be4843710702",
+      "name": "📨 Telegram — Job Results",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4624,
+        1184
+      ],
+      "webhookId": "e6f76e44-71ee-4e2f-8e7b-d9d13e6ba8b5",
+      "credentials": {
+        "telegramApi": {
+          "id": "TELEGRAM_CRED_ID",
+          "name": "Telegram Bot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "5513468743",
+        "text": "=⚠️ *Job Hunt — No High Priority Matches Found*\n\n{{ $json.note }}\n\nMedium priority jobs: {{ $json.search_stats?.medium_priority }}\n\n💡 Try broadening your search: add more locations, adjust job titles, or add more platforms.",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "ba46bbe7-2abe-4ff1-986b-070dd56f60bb",
+      "name": "⚠️ Telegram — No Results",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4368,
+        1392
+      ],
+      "webhookId": "6ecf1b68-38e5-4332-87f5-e9830bf3efa9",
+      "credentials": {
+        "telegramApi": {
+          "id": "TELEGRAM_CRED_ID",
+          "name": "Telegram Bot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "5513468743",
+        "text": "=❌ *Job Hunt Workflow Failed*\n\n*Error:* {{ $json.message }}\n*Node:* {{ $json.node }}\n*Time:* {{ $json.timestamp }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "53c8ea98-9f4f-4b9f-be42-b59f83184ec1",
+      "name": "❌ Telegram — Error",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        656,
+        1920
+      ],
+      "webhookId": "3bc4c8a8-afb8-49b1-9402-57d830190f07",
+      "credentials": {
+        "telegramApi": {
+          "id": "TELEGRAM_CRED_ID",
+          "name": "Telegram Bot API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Load Resume & Preferences",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Resume & Preferences": {
+      "main": [
+        [
+          {
+            "node": "Parse Resume Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Resume Chain": {
+      "main": [
+        [
+          {
+            "node": "Build Search Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Search Config": {
+      "main": [
+        [
+          {
+            "node": "Prepare Platform Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Platform Items": {
+      "main": [
+        [
+          {
+            "node": "Platform Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Platform Switch": {
+      "main": [
+        [
+          {
+            "node": "Remotive Jobs (Free)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Jobicy Jobs (Free)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unstop Jobs (Public)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Arbeitnow Jobs (Free)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RemoteOK Jobs (Free)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Himalayas Jobs (Free)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "The Muse Jobs (Free)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remotive Jobs (Free)": {
+      "main": [
+        [
+          {
+            "node": "Normalize Job Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unstop Jobs (Public)": {
+      "main": [
+        [
+          {
+            "node": "Normalize Job Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Arbeitnow Jobs (Free)": {
+      "main": [
+        [
+          {
+            "node": "Normalize Job Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RemoteOK Jobs (Free)": {
+      "main": [
+        [
+          {
+            "node": "Normalize Job Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Himalayas Jobs (Free)": {
+      "main": [
+        [
+          {
+            "node": "Normalize Job Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "The Muse Jobs (Free)": {
+      "main": [
+        [
+          {
+            "node": "Normalize Job Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Job Results": {
+      "main": [
+        [
+          {
+            "node": "Aggregate & Pre-Score Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate & Pre-Score Jobs": {
+      "main": [
+        [
+          {
+            "node": "AI Match & Score Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Match & Score Chain": {
+      "main": [
+        [
+          {
+            "node": "Rank & Filter Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rank & Filter Jobs": {
+      "main": [
+        [
+          {
+            "node": "Generate Career Strategy Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Career Strategy Chain": {
+      "main": [
+        [
+          {
+            "node": "Assemble Final Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assemble Final Output": {
+      "main": [
+        [
+          {
+            "node": "Has High Priority Results?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has High Priority Results?": {
+      "main": [
+        [
+          {
+            "node": "Log Results (No-op)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "⚠️ No High Priority Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Results (No-op)": {
+      "main": [
+        [
+          {
+            "node": "✅ Final Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "❌ Error Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "✅ Final Results": {
+      "main": [
+        [
+          {
+            "node": "📨 Telegram — Job Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚠️ No High Priority Results": {
+      "main": [
+        [
+          {
+            "node": "⚠️ Telegram — No Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "❌ Error Output": {
+      "main": [
+        [
+          {
+            "node": "❌ Telegram — Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini — Parse Resume": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Parse Resume Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini — Match & Score": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Match & Score Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini — Career Strategy": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Career Strategy Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jobicy Jobs (Free)": {
+      "main": [
+        [
+          {
+            "node": "Normalize Job Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "v5-fully-free",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "375529843116fdbf24b6cd24f4ef232de884c25232d0bd94a64f2770c08bd689"
+  },
+  "id": "oeTeb6Q8onzfKDYF",
+  "tags": [
+    {
+      "updatedAt": "2026-05-30T19:48:41.905Z",
+      "createdAt": "2026-05-30T19:48:41.905Z",
+      "id": "E4r1prOpYtwZnPn9",
+      "name": "AI Agent"
+    },
+    {
+      "updatedAt": "2026-05-30T19:48:41.853Z",
+      "createdAt": "2026-05-30T19:48:41.853Z",
+      "id": "pa9Sa2c5OeW7LPfN",
+      "name": "Resume"
+    },
+    {
+      "updatedAt": "2026-05-30T19:48:41.914Z",
+      "createdAt": "2026-05-30T19:48:41.914Z",
+      "id": "rIeG9OBCBJltWuP5",
+      "name": "Job Hunt"
+    }
+  ]
+}
