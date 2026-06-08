@@ -1,0 +1,376 @@
+{
+  "name": "Krish Rathi – HR Cold Email Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# 🚀 Krish Rathi – HR Cold Email Agent\n\n## Setup Checklist\n1. **Google Sheets** – Create a sheet called `EmailTracker` with columns:\n   `id | hr_name | hr_email | hr_title | company | status | sent_at | opened_at | replied_at | follow_up_sent | notes`\n   → Paste the sheet ID in the \"Config\" node below.\n\n2. **Gmail** – Add a Gmail OAuth2 credential and select it on the Gmail nodes.\n\n3. **Gemini** – Add a Google Gemini API credential.\n\n4. **Resume Drive Link** – Upload your PDF to Google Drive and paste the shareable link in Config.\n\n5. **Webhook Dashboard** – The webhook node exposes `/webhook/hr-tracker` for the dashboard to pull live data.\n\n## Flow\nManual / Every 1 Min Trigger → Load HRs from Sheet → Batch 10 → AI writes personalised email → Gmail send → Log to Sheet → Expose via Webhook for Dashboard",
+        "height": 420,
+        "width": 560,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-1100, -500],
+      "id": "sticky-instructions",
+      "name": "Setup Instructions"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-860, -120],
+      "id": "manual-trigger",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "minutes", "minutesInterval": 1 }]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-860, 20],
+      "id": "daily-trigger",
+      "name": "Every 1 Minute Trigger"
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "hr-tracker",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-860, 160],
+      "id": "dashboard-webhook",
+      "name": "Dashboard Webhook",
+      "webhookId": "hr-tracker-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ——— CONFIGURATION ———————————————————————————————————————————\nconst CONFIG = {\n  candidateName:    'Krish Rathi',\n  candidateEmail:   'krishrathi877@gmail.com',\n  candidatePhone:   '+91 93523 39808',\n  linkedinUrl:      'linkedin.com/in/krish-rathi',\n  githubUrl:        'github.com/krish',\n  resumeDriveLink:  'https://drive.google.com/file/d/195RH99pePnHBWtZEs6SKL_kAtfX-JQFA/view?usp=sharing',\n  googleSheetId:    '1t0az-y0QSBBDdt2F6P1jCWM40g8g96jLFyTmVYWv7jw',\n  batchSize:        10,    // HRs to email per run (Changed to 10 as requested)\n  dailyLimit:       50,    // hard daily cap\n  delayBetweenMs:   8000,  // 8s between sends to avoid spam flags\n\n  // Top skills for subject line personalisation\n  topSkills: ['React', 'Next.js', 'AI/ML', 'LLM', 'Full Stack', 'Node.js', 'Firebase', 'AWS'],\n\n  highlights: [\n    'Chatbot Developer Intern @ RANNLAB – built RAG pipeline reducing support load 70%',\n    'Facial recognition pipeline (AWS Rekognition) – 98.87% accuracy, 1000+ daily users',\n    'StockVision – production AI stock platform with Gemini AI & real-time feeds',\n    'KishanBhai – multilingual offline-first PWA for 100+ agricultural commodities',\n    'IIT Ropar Hackathon Winner 2025, 3× national AI/ML wins',\n    '280+ LeetCode/Codeforces problems – DP, Graphs, System Design'\n  ]\n};\n// ————————————————————————————————————————————————————————————\n\nconst trigger = $input.first().json;\nconst isWebhook = trigger.headers !== undefined;\n\nreturn [{ json: { config: CONFIG, isWebhook, timestamp: new Date().toISOString() } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-580, 20],
+      "id": "config-node",
+      "name": "Config"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.isWebhook }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equal" }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [-340, 20],
+      "id": "if-webhook",
+      "name": "Is Dashboard Request?"
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "={{ $('Config').first().json.config.googleSheetId }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "EmailTracker", "mode": "name" },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [-80, -120],
+      "id": "read-tracker-for-dashboard",
+      "name": "Read Tracker (Dashboard)",
+      "credentials": { "googleSheetsOAuth2Api": { "id": "ADD_GOOGLE_SHEETS_CREDENTIAL", "name": "Google Sheets" } }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $input.all().map(i => i.json), generatedAt: new Date().toISOString() }) }}",
+        "options": { "responseHeaders": { "entries": [{ "name": "Access-Control-Allow-Origin", "value": "*" }] } }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [180, -120],
+      "id": "respond-to-webhook",
+      "name": "Return Dashboard Data"
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "={{ $('Config').first().json.config.googleSheetId }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "HRList", "mode": "name" },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [-80, 120],
+      "id": "read-hr-list",
+      "name": "Read HR List from Sheet",
+      "credentials": { "googleSheetsOAuth2Api": { "id": "ADD_GOOGLE_SHEETS_CREDENTIAL", "name": "Google Sheets" } }
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "={{ $('Config').first().json.config.googleSheetId }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "EmailTracker", "mode": "name" },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [180, 120],
+      "id": "read-already-sent",
+      "name": "Read Already Sent Emails",
+      "credentials": { "googleSheetsOAuth2Api": { "id": "ADD_GOOGLE_SHEETS_CREDENTIAL", "name": "Google Sheets" } },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const config = $('Config').first().json.config;\nconst hrList = $('Read HR List from Sheet').all().map(i => i.json);\nconst alreadySent = $('Read Already Sent Emails').all().map(i => i.json);\n\n// Build set of already-emailed addresses\nconst sentEmails = new Set(alreadySent.map(r => (r.hr_email || '').toLowerCase().trim()));\n\n// Filter out already-contacted, skip invalid rows\nconst pending = hrList.filter(hr => {\n  const email = (hr.Email || '').toLowerCase().trim();\n  return email &&\n    email.includes('@') &&\n    !sentEmails.has(email) &&\n    hr.Name &&\n    hr.Company;\n});\n\n// Take batch\nconst batch = pending.slice(0, config.batchSize);\n\nconsole.log(`Pending: ${pending.length}, Sending batch of: ${batch.length}`);\n\nif (batch.length === 0) {\n  return [{ json: { _noBatch: true, message: 'No new HRs to contact in this run.', totalPending: 0 } }];\n}\n\nreturn batch.map((hr, idx) => ({\n  json: {\n    idx,\n    hr_name:    hr.Name || '',\n    hr_email:   hr.Email || '',\n    hr_title:   hr.Title || 'HR',\n    company:    (hr.Company || '').replace(/,$/, '').trim(),\n    config,\n    requestId:  `krish-${Date.now()}-${idx}`\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 120],
+      "id": "filter-batch",
+      "name": "Filter & Batch HRs"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json._noBatch }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equal" }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [700, 120],
+      "id": "check-no-batch",
+      "name": "Any HRs to Email?"
+    },
+    {
+      "parameters": {
+        "jsCode": "console.log('No pending HRs this run. All done for today or sheet is empty.');\nreturn [{ json: { done: true, message: $json.message } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 260],
+      "id": "no-batch-end",
+      "name": "Done – No New HRs"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are Krish Rathi, a 4th-year B.Tech CS student and AI/Full Stack developer. Write a short, highly personalised cold email to an HR professional.\n\nHR Details:\n- Name: {{ $json.hr_name }}\n- Title: {{ $json.hr_title }}\n- Company: {{ $json.company }}\n\nYour profile:\n- Name: Krish Rathi\n- Role: 4th-year B.Tech CS (2023-2027) at BML Munjal University\n- Internship: Chatbot Developer @ RANNLAB Technologies (Jun-Nov 2025) – built RAG pipeline (70% support load reduction), AWS Rekognition pipeline (98.87% accuracy)\n- Projects: StockVision (AI stock platform, Gemini AI, Next.js), KishanBhai (multilingual ag-tech PWA, 100+ commodities), Agentic AI Browser\n- Achievements: IIT Ropar Hackathon Winner 2025, 3× national AI/ML wins, 280+ DSA problems\n- Skills: React, Next.js, TypeScript, Python, Gemini API, RAG, Firebase, AWS Lambda, Docker\n- LinkedIn: linkedin.com/in/krish-rathi\n- GitHub: github.com/krish\n- Phone: +91 93523 39808\n\nRules:\n1. Subject line must be punchy and specific to {{ $json.company }} — mention one likely tech stack or product area they work on\n2. First line MUST personalise to their company (mention a product, their industry, or their tech focus)\n3. Mention 1-2 specific achievements with numbers\n4. Keep the body under 120 words\n5. End with a soft CTA: ask for a 10-min call or to review the resume\n6. Attach line: mention resume is attached\n7. Tone: confident, direct, NOT sycophantic\n\nReturn ONLY valid JSON (no markdown):\n{\n  \"subject\": \"...\",\n  \"body\": \"...\"\n}\nThe body should be plain text, use \\n for line breaks."
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [960, 80],
+      "id": "ai-write-email",
+      "name": "AI Write Personalised Email",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [960, 280],
+      "id": "gemini-model",
+      "name": "Gemini Flash",
+      "credentials": { "googlePalmApi": { "id": "ADD_GEMINI_CREDENTIAL", "name": "Gemini API Key" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $ ('Filter & Batch HRs').all();\nconst aiItems = $input.all();\n\n// Match back to HR data using item index\nconst results = aiItems.map((item, idx) => {\n  const rawText = item.json.text || '{}';\n  let parsed = { subject: '', body: '' };\n\n  try {\n    let cleaned = rawText.trim();\n    const start = cleaned.indexOf('{');\n    const end = cleaned.lastIndexOf('}');\n    if (start !== -1 && end !== -1) cleaned = cleaned.substring(start, end + 1);\n    parsed = JSON.parse(cleaned);\n  } catch (e) {\n    // Fallback template if AI parse fails\n    const hrData = prev[idx]?.json || {};\n    parsed = {\n      subject: `Internship / Full-Stack Role – Krish Rathi (AI/React/Next.js)`,\n      body: `Hi ${hrData.hr_name || 'there'},\\n\\nI'm Krish Rathi, a CS student at BML Munjal with hands-on experience building AI-driven products. At RANNLAB I shipped a RAG chatbot that cut support load by 70%, and an AWS Rekognition pipeline at 98.87% accuracy.\\n\\nI'd love to explore opportunities at ${hrData.company || 'your company'}. Please find my resume attached – happy to chat for 10 minutes at your convenience.\\n\\nBest,\\nKrish Rathi\\n+91 93523 39808 | linkedin.com/in/krish-rathi`\n    };\n  }\n\n  // Pull HR metadata from corresponding input batch item\n  const hr = prev[idx]?.json || item.json;\n\n  return {\n    json: {\n      hr_name:   hr.hr_name,\n      hr_email:  hr.hr_email,\n      hr_title:  hr.hr_title,\n      company:   hr.company,\n      subject:   parsed.subject,\n      body:      parsed.body,\n      requestId: hr.requestId,\n      config:    hr.config\n    }\n  };\n});\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1220, 80],
+      "id": "parse-ai-email",
+      "name": "Parse AI Email Content"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.hr_email }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.body }}\\n\\n--\\nKrish Rathi\\n+91 93523 39808 | krishrathi877@gmail.com\\nlinkedin.com/in/krish-rathi | github.com/krish",
+        "options": {
+          "attachments": "={{ $json.config.resumeDriveLink }}",
+          "ccList": "",
+          "replyTo": "krishrathi877@gmail.com"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1480, 80],
+      "id": "send-gmail",
+      "name": "Send Gmail with Resume",
+      "credentials": { "gmailOAuth2": { "id": "ADD_GMAIL_CREDENTIAL", "name": "Gmail OAuth2" } },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\nconst sent = $('Send Gmail with Resume').first()?.json;\nconst success = sent && !sent.error;\n\nreturn [{\n  json: {\n    id:             input.requestId || `kr-${Date.now()}`,\n    hr_name:        input.hr_name,\n    hr_email:       input.hr_email,\n    hr_title:       input.hr_title,\n    company:        input.company,\n    subject:        input.subject,\n    status:         success ? 'sent' : 'failed',\n    sent_at:        success ? new Date().toISOString() : '',\n    opened_at:      '',\n    replied_at:     '',\n    follow_up_sent: 'no',\n    error:          success ? '' : JSON.stringify(sent?.error || 'unknown'),\n    notes:          ''\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1740, 80],
+      "id": "build-log-row",
+      "name": "Build Log Row"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "={{ $('Config').first().json.config.googleSheetId }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "EmailTracker", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id":             "={{ $json.id }}",
+            "hr_name":        "={{ $json.hr_name }}",
+            "hr_email":       "={{ $json.hr_email }}",
+            "hr_title":       "={{ $json.hr_title }}",
+            "company":        "={{ $json.company }}",
+            "subject":        "={{ $json.subject }}",
+            "status":         "={{ $json.status }}",
+            "sent_at":        "={{ $json.sent_at }}",
+            "opened_at":      "={{ $json.opened_at }}",
+            "replied_at":     "={{ $json.replied_at }}",
+            "follow_up_sent": "={{ $json.follow_up_sent }}",
+            "error":          "={{ $json.error }}",
+            "notes":          "={{ $json.notes }}"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [2000, 80],
+      "id": "log-to-sheet",
+      "name": "Log to EmailTracker Sheet",
+      "credentials": { "googleSheetsOAuth2Api": { "id": "ADD_GOOGLE_SHEETS_CREDENTIAL", "name": "Google Sheets" } }
+    },
+    {
+      "parameters": {
+        "amount": 8,
+        "unit": "seconds"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [2260, 80],
+      "id": "rate-limit-wait",
+      "name": "Rate Limit Delay (8s)"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allLogs = $input.all().map(i => i.json);\nconst sent    = allLogs.filter(r => r.status === 'sent').length;\nconst failed  = allLogs.filter(r => r.status === 'failed').length;\n\nreturn [{\n  json: {\n    summary: `✅ Batch complete – Sent: ${sent}, Failed: ${failed}, Total: ${allLogs.length}`,\n    sent, failed, total: allLogs.length,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2520, 80],
+      "id": "batch-summary",
+      "name": "Batch Summary"
+    },
+    {
+      "parameters": {
+        "content": "## ✉️ Follow-up Sub-flow\nSeparate daily run: checks EmailTracker for emails sent 3 days ago with no reply → sends follow-up via Gmail → updates Sheet status to `follow_up_sent`.\n\nConnect a second Schedule Trigger (daily 2 PM) → Read EmailTracker → Filter rows where `status=sent AND follow_up_sent=no AND sent_at < 3 days ago` → AI writes follow-up → Gmail → Update Sheet row.",
+        "height": 200,
+        "width": 480,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2000, -340],
+      "id": "sticky-followup",
+      "name": "Follow-up Note"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [[{ "node": "Config", "type": "main", "index": 0 }]]
+    },
+    "Daily 9 AM Trigger": {
+      "main": [[{ "node": "Config", "type": "main", "index": 0 }]]
+    },
+    "Dashboard Webhook": {
+      "main": [[{ "node": "Config", "type": "main", "index": 0 }]]
+    },
+    "Config": {
+      "main": [[{ "node": "Is Dashboard Request?", "type": "main", "index": 0 }]]
+    },
+    "Is Dashboard Request?": {
+      "main": [
+        [{ "node": "Read Tracker (Dashboard)", "type": "main", "index": 0 }],
+        [{ "node": "Read HR List from Sheet", "type": "main", "index": 0 }]
+      ]
+    },
+    "Read Tracker (Dashboard)": {
+      "main": [[{ "node": "Return Dashboard Data", "type": "main", "index": 0 }]]
+    },
+    "Read HR List from Sheet": {
+      "main": [[{ "node": "Read Already Sent Emails", "type": "main", "index": 0 }]]
+    },
+    "Read Already Sent Emails": {
+      "main": [[{ "node": "Filter & Batch HRs", "type": "main", "index": 0 }]]
+    },
+    "Filter & Batch HRs": {
+      "main": [[{ "node": "Any HRs to Email?", "type": "main", "index": 0 }]]
+    },
+    "Any HRs to Email?": {
+      "main": [
+        [{ "node": "Done – No New HRs", "type": "main", "index": 0 }],
+        [{ "node": "AI Write Personalised Email", "type": "main", "index": 0 }]
+      ]
+    },
+    "Gemini Flash": {
+      "ai_languageModel": [[{ "node": "AI Write Personalised Email", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "AI Write Personalised Email": {
+      "main": [[{ "node": "Parse AI Email Content", "type": "main", "index": 0 }]]
+    },
+    "Parse AI Email Content": {
+      "main": [[{ "node": "Send Gmail with Resume", "type": "main", "index": 0 }]]
+    },
+    "Send Gmail with Resume": {
+      "main": [[{ "node": "Build Log Row", "type": "main", "index": 0 }]]
+    },
+    "Build Log Row": {
+      "main": [[{ "node": "Log to EmailTracker Sheet", "type": "main", "index": 0 }]]
+    },
+    "Log to EmailTracker Sheet": {
+      "main": [[{ "node": "Rate Limit Delay (8s)", "type": "main", "index": 0 }]]
+    },
+    "Rate Limit Delay (8s)": {
+      "main": [[{ "node": "Batch Summary", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  }
+}
